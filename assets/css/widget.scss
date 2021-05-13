@@ -1,0 +1,30 @@
+div.taut_room {
+		width: 100%;
+		background-color: #666;
+		border-radius: 20px;
+		padding: 1em;
+		div.taut_room_message_mine {
+				margin-left: 3em;
+				border-bottom-left-radius: 20px;
+				border-top-left-radius: 20px;
+				background-color: #aaa;
+				margin-bottom: 5px;
+				padding: 5px 10px;
+				color: #000;
+		}
+		div.taut_room_message {
+				width: 95%;
+				margin-right: 3em;
+				border-bottom-right-radius: 20px;
+				border-top-right-radius: 20px;
+				background-color: #fff;
+				margin-bottom: 5px;
+				padding: 5px 10px;
+				color: #000;
+		}
+		div.taut_input {
+				input[type=text] {
+						width: 100%;
+				}
+		}
+}
