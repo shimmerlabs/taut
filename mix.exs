@@ -47,6 +47,7 @@ defmodule Taut.MixProject do
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
+      {:earmark, "~> 1.4"},
 
       # Dev/test-only deps below here.
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false}

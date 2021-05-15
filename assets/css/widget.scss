@@ -3,6 +3,15 @@ div.taut_room {
 		background-color: #666;
 		border-radius: 20px;
 		padding: 1em;
+		height: 80vh;
+		display:  grid;
+		grid-auto-flow: row;
+		grid-template-rows: auto 6rem;
+		grid-row-gap: 10px;
+		div.taut_room_messages {
+				overflow-y: scroll;
+				grid-row-start: 1;
+		}
 		div.taut_room_message_mine {
 				margin-left: 3em;
 				border-bottom-left-radius: 20px;

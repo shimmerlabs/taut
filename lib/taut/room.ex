@@ -1,6 +1,8 @@
 defmodule Taut.Room do
   use Taut.Model
 
+  alias Taut.Message
+
   schema "taut_rooms" do
     field :name, :string
     field :private, :boolean, default: false
@@ -69,9 +71,31 @@ defmodule Taut.Room do
     Phoenix.PubSub.subscribe(Taut.PubSub, "taut_room:#{room_id}")
   end
 
+  @doc """
+  Broadcast a message to the given room, from the given user.
+
+  TRANSITIONAL.  Use Message.post() to create and (if valid) post the
+  message.  This may be used in future for "non-message" Room events.
+  """
   def post_message(%__MODULE__{}=room, %Taut.User{}=user, msg) do
     Phoenix.PubSub.broadcast(Taut.PubSub, "taut_room:#{room.id}",
-      {__MODULE__, :msg, %{id: "taut_msg_#{Ecto.UUID.generate()}", content: msg, user: user, room: room}})
+      {__MODULE__, :msg, %{
+       id: "taut_msg_#{Ecto.UUID.generate()}",
+       content: msg,
+       user: user,
+       room: room }
+      }
+    )
+  end
+
+  def messages(%__MODULE__{id: rid}, :last_20) do
+    from(m in Message, where: [room_id: ^rid], 
+         limit: 20, order_by: [desc: m.inserted_at], preload: [:room, :user])
+    |> Repo.all()
+    |> Enum.reduce([], fn msg, acc ->
+      # Convert to payloads and reverse in one go.
+      [ Message.to_payload(msg) | acc ]
+    end)
   end
 
   defdelegate widget(socket, user), to: TautWeb.RoomLive

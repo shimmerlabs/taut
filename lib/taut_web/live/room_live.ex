@@ -3,17 +3,20 @@ defmodule TautWeb.RoomLive do
 
   require Logger
 
+  alias Taut.{Message, Room}
+
   @impl Phoenix.LiveView
   def mount(_params, %{"user" => user}=session, socket) do
     room = session["room"]
 
-    if room && connected?(socket), do: Taut.Room.subscribe_to(room)
+    if room && connected?(socket), do: Room.subscribe_to(room)
 
     socket = socket
       |> assign(:user, user)
       |> assign(:room, room)
-      |> assign(:msg_input, Taut.Message.new())
+      |> assign(:msg_input, Message.new())
       |> assign(:msg_text, "")
+      |> assign(:messages, Room.messages(room, :last_20))
 
     {:ok, socket, temporary_assigns: [messages: []]}
   end
@@ -22,16 +25,16 @@ defmodule TautWeb.RoomLive do
   def render(assigns) do
     ~L"""
     <div class="taut_room">
-      <div id="room-messages" phx-update="append">
+      <div class="taut_room_messages" id="taut-room-messages" phx-update="append" phx-hook="Taut">
         <%= for msg <- @messages do %>
           <%= if msg.user.id == @user.id do %>
             <div id="<%= msg.id %>" class="taut_room_message_mine">
-              <%= msg.content %>
+              <%= Message.format(msg.content) %>
             </div>
           <% else %>
             <div id="<%= msg.id %>" class="taut_room_message">
               <b><%= msg.user.display_name %> wrote:</b>
-              <%= msg.content %>
+              <%= Message.format(msg.content) %>
             </div>
           <% end %>
         <% end %>
@@ -49,11 +52,16 @@ defmodule TautWeb.RoomLive do
 
   @impl true
   def handle_event("send_new_message", %{"message" => msg}, socket) do
-    Taut.Room.post_message(socket.assigns.room, socket.assigns.user, msg["content"])
-    socket = update(socket, :msg_text, fn _ -> msg["content"] end)
-      |> update(:msg_text, fn _ -> "" end)
-      |> update(:msg_input, fn _ -> Taut.Message.new() end)
-    {:noreply, socket}
+    Message.post(msg["content"], to: socket.assigns.room, from: socket.assigns.user)
+    |> case do
+      {:ok, _msg} -> 
+        socket = update(socket, :msg_text, fn _ -> msg["content"] end)
+          |> update(:msg_text, fn _ -> "" end)
+          |> update(:msg_input, fn _ -> Message.new() end)
+        {:noreply, socket}
+      {:error, cs} ->
+        {:noreply, update(socket, :msg_input, fn _ -> cs end)}
+    end
   end
 
   def handle_event("send_new_message", params, socket) do
@@ -62,13 +70,13 @@ defmodule TautWeb.RoomLive do
   end
 
   @impl true
-  def handle_info({Taut.Room, :msg, payload}, socket) do
-    socket = update(socket, :messages, &([payload | &1]))
+  def handle_info({Taut.Message, :msg, payload}, socket) do
+    socket = assign(socket, :messages, [payload])
     {:noreply, socket}
   end
 
   def widget(socket, user, room \\ nil) do
-    room = Taut.Room.get_by_name(room)
+    room = Room.get_by_name(room)
     live_render(socket, __MODULE__,
                 id: "taut_#{user.foreign_id || Ecto.UUID.generate()}",
                 session: %{"user" => user, "room" => room})

@@ -1,10 +1,12 @@
 defmodule TautWeb.Helpers do
   import Phoenix.LiveView
 
+  # POSSIBLE DEPRECATION:  Just pass Taut.User to widget for now
   def default_user(_, _) do
     %Taut.User{display_name: "Anonymous", role: "visitor"}
   end
 
+  # POSSIBLE DEPRECATION:  Just pass Taut.user to widget for now
   def get_user_from_session(socket, session) do
     Application.get_env(:taut, :user_identity, &default_user/2).(socket, session)
   end
