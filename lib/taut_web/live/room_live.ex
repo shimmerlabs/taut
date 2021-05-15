@@ -25,7 +25,7 @@ defmodule TautWeb.RoomLive do
   def render(assigns) do
     ~L"""
     <div class="taut_room">
-      <div id="room-messages" phx-update="append">
+      <div class="taut_room_messages" id="taut-room-messages" phx-update="append" phx-hook="Taut">
         <%= for msg <- @messages do %>
           <%= if msg.user.id == @user.id do %>
             <div id="<%= msg.id %>" class="taut_room_message_mine">
