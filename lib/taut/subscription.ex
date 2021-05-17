@@ -5,7 +5,7 @@ defmodule Taut.Subscription do
     belongs_to :room, Taut.Room
     belongs_to :user, Taut.User
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc false

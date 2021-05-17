@@ -11,6 +11,10 @@ config :taut,
   ecto_repos: [Taut.Repo],
   generators: [binary_id: true]
 
+config :taut, Taut.Repo,
+  migration_primary_key: [type: :binary_id],
+  migration_timestamps: [type: :utc_datetime]
+
 # Configures the endpoint
 config :taut, TautWeb.Endpoint,
   url: [host: "localhost"],

@@ -4,19 +4,17 @@ div.taut_room {
 		border-radius: 20px;
 		padding: 1em;
 		height: 80vh;
-		display:  grid;
-		grid-auto-flow: row;
-		grid-template-rows: auto 6rem;
-		grid-row-gap: 10px;
+		display: flex;
+		flex-direction: column;
 		div.taut_room_messages {
 				overflow-y: scroll;
-				grid-row-start: 1;
+				flex-grow: 1;
 		}
 		div.taut_room_message_mine {
 				margin-left: 3em;
 				border-bottom-left-radius: 20px;
 				border-top-left-radius: 20px;
-				background-color: #aaa;
+				background-color: #ddd;
 				margin-bottom: 5px;
 				padding: 5px 10px;
 				color: #000;
@@ -30,10 +28,36 @@ div.taut_room {
 				margin-bottom: 5px;
 				padding: 5px 10px;
 				color: #000;
+
+				span[data-at] {
+						float: right;
+				}
 		}
 		div.taut_input {
+				&:focus {
+						outline: none;
+				}
+				flex-shrink: 0;
 				input[type=text] {
 						width: 100%;
+				}
+				textarea {
+						width: 100%;
+						min-height: 10px;
+						overflow: hidden;
+						resize: none;
+						border: 1px solid #333;
+				}
+				div#taut_message_input {
+						border: 1px solid #333;
+						background-color: #bea;
+						color: #000;
+						padding: 5px;
+						cursor: text;
+						min-height: 1rem;
+						&:focus {
+								outline: none;
+						}
 				}
 		}
 }

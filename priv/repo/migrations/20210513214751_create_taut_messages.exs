@@ -8,7 +8,7 @@ defmodule Taut.Repo.Migrations.CreateTautMessages do
       add :user_id, references(:taut_users, on_delete: :nilify_all, type: :binary_id)
       add :room_id, references(:taut_rooms, on_delete: :delete_all, type: :binary_id), null: false
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
     create index(:taut_messages, [:user_id])

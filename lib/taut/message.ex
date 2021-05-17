@@ -9,7 +9,7 @@ defmodule Taut.Message do
     belongs_to :user, User
     belongs_to :room, Room
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc false
@@ -82,7 +82,7 @@ defmodule Taut.Message do
   {:safe, html} on success, or just the given input on failure
   """
   def safe_markdown(content) do
-    case Earmark.as_html(content) do
+    case Earmark.as_html(content, pedantic: true, gfm: true, breaks: true) do
       {:ok, html, _} -> {:safe, html}
       {:error, _, _} -> content
     end
@@ -94,8 +94,9 @@ defmodule Taut.Message do
   def to_payload(%__MODULE__{id: id, content: content}=msg) do
     msg
     |> Repo.preload(:user)
-    |> Map.take([:user, :content])
-    |> Map.put(:id, "taut_msg_#{id}")
+    |> Map.merge(%{id: "taud_msg_#{id}",
+                   inserted_at: DateTime.to_iso8601(msg.inserted_at),
+                   updated_at: DateTime.to_iso8601(msg.updated_at)})
   end
 
 end
