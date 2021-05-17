@@ -8,7 +8,7 @@ defmodule Taut.Repo.Migrations.CreateUsers do
       add :foreign_id, :string, required: true
       add :role, :string, required: true, default: "visitor"
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
     create unique_index(:taut_users, :foreign_id)

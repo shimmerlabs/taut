@@ -9,7 +9,7 @@ defmodule Taut.User do
     has_many :subscriptions, Taut.Subscription
     has_many :rooms, through: [:subscriptions, :room]
 
-    timestamps()
+    timestamps(type: :utc_datetime)
   end
 
   @doc """

@@ -8,7 +8,7 @@ defmodule Taut.Repo.Migrations.CreateTautRooms do
       add :topic, :string
       add :private, :boolean, default: false, null: false
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
   end

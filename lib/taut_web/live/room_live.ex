@@ -33,6 +33,7 @@ defmodule TautWeb.RoomLive do
             </div>
           <% else %>
             <div id="<%= msg.id %>" class="taut_room_message">
+              <span data-at="<%= msg.inserted_at %>"></span>
               <b><%= msg.user.display_name %> wrote:</b>
               <%= Message.format(msg.content) %>
             </div>

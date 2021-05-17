@@ -7,7 +7,7 @@ defmodule Taut.Repo.Migrations.CreateTautSubscriptions do
       add :room_id, references(:taut_rooms, on_delete: :delete_all, type: :binary_id), null: false
       add :user_id, references(:taut_users, on_delete: :delete_all, type: :binary_id), null: false
 
-      timestamps()
+      timestamps(type: :utc_datetime)
     end
 
     create index(:taut_subscriptions, [:room_id])
