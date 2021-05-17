@@ -16,6 +16,7 @@ defmodule TautWeb.RoomLive do
       |> assign(:room, room)
       |> assign(:msg_input, Message.new())
       |> assign(:msg_text, "")
+      |> assign(:msg_preview, "")
       |> assign(:messages, Room.messages(room, :last_20))
 
     {:ok, socket, temporary_assigns: [messages: []]}
@@ -25,7 +26,7 @@ defmodule TautWeb.RoomLive do
   def render(assigns) do
     ~L"""
     <div class="taut_room">
-      <div class="taut_room_messages" id="taut-room-messages" phx-update="append" phx-hook="Taut">
+      <div class="taut_room_messages" id="taut-room-messages" phx-update="append" phx-hook="TautMessageHooks">
         <%= for msg <- @messages do %>
           <%= if msg.user.id == @user.id do %>
             <div id="<%= msg.id %>" class="taut_room_message_mine">
@@ -42,9 +43,16 @@ defmodule TautWeb.RoomLive do
       </div>
       <div class="taut_input">
         <p>You are logged into <%= @room.name %>  as <%= @user.display_name %></p>
-        <%= f = form_for @msg_input, "#", [phx_submit: :send_new_message] %>
+        <%= f = form_for @msg_input, "#", [phx_submit: :send_new_message, phx_change: "preview_message", phx_debounce: "1000"] %>
           <%= label f, :content, "Enter your message:" %>
-          <%= text_input f, :content, value: @msg_text %>
+          <%= unless @msg_preview == "" do %>
+            <div id="taut_message_input">
+              <span class="preview">Preview:</span>
+              <%= @msg_preview %>
+            </div>
+          <% end %>
+
+          <%= textarea f, :content, value: @msg_text, autocomplete: "off" %>
         </form>
       </div>
     </div>
@@ -58,6 +66,7 @@ defmodule TautWeb.RoomLive do
       {:ok, _msg} -> 
         socket = update(socket, :msg_text, fn _ -> msg["content"] end)
           |> update(:msg_text, fn _ -> "" end)
+          |> update(:msg_preview, fn _ -> "" end)
           |> update(:msg_input, fn _ -> Message.new() end)
         {:noreply, socket}
       {:error, cs} ->
@@ -70,8 +79,15 @@ defmodule TautWeb.RoomLive do
     {:noreply, socket}
   end
 
+  def handle_event("preview_message", %{"message" => msg}, socket) do
+    socket = socket
+      |> update(:msg_preview, fn _ -> Message.format(msg["content"]) end)
+    {:noreply, socket}
+  end
+
+
   @impl true
-  def handle_info({Taut.Message, :msg, payload}, socket) do
+  def handle_info({Message, :msg, payload}, socket) do
     socket = assign(socket, :messages, [payload])
     {:noreply, socket}
   end

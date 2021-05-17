@@ -82,7 +82,7 @@ defmodule Taut.Message do
   {:safe, html} on success, or just the given input on failure
   """
   def safe_markdown(content) do
-    case Earmark.as_html(content) do
+    case Earmark.as_html(content, pedantic: true, gfm: true, breaks: true) do
       {:ok, html, _} -> {:safe, html}
       {:error, _, _} -> content
     end
