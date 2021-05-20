@@ -43,15 +43,8 @@ defmodule TautWeb.RoomLive do
       </div>
       <div class="taut_input">
         <p>You are logged into <%= @room.name %>  as <%= @user.display_name %></p>
-        <%= f = form_for @msg_input, "#", [phx_submit: :send_new_message, phx_change: "preview_message", phx_debounce: "1000"] %>
+        <%= f = form_for @msg_input, "#", [phx_submit: :send_new_message] %>
           <%= label f, :content, "Enter your message:" %>
-          <%= unless @msg_preview == "" do %>
-            <div id="taut_message_input">
-              <span class="preview">Preview:</span>
-              <%= @msg_preview %>
-            </div>
-          <% end %>
-
           <%= textarea f, :content, value: @msg_text, autocomplete: "off" %>
         </form>
       </div>
